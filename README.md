@@ -53,7 +53,7 @@ Circle members invite people by email from onboarding or from the **Invite** but
 - **New emails:** the app records the invite and sends a Supabase invite email (see Mailpit locally). The link signs the person in and sends them to onboarding, where they pick a password and can accept the invite.
 - **Existing accounts:** no email is sent. The invite shows up in onboarding and in the bell menu on the dashboard.
 
-Sending invite emails uses the service role key, so `SUPABASE_SERVICE_ROLE_KEY` must be set on the server. Never expose it to the browser.
+Sending invite emails uses the service role key, so `SUPABASE_SECRET_KEY` must be set on the server. Never expose it to the browser.
 
 ## Scripts
 
@@ -80,4 +80,4 @@ Sending invite emails uses the service role key, so `SUPABASE_SERVICE_ROLE_KEY` 
 
 1. Create a hosted Supabase project, then `npx supabase link` and `npx supabase db push`.
 2. In the dashboard, set the Site URL and redirect URLs to your app domain. Paste the contents of `supabase/templates/invite.html` into the "Invite user" email template.
-3. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `NEXT_PUBLIC_SITE_URL` in your host's environment.
+3. Set `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, and `NEXT_PUBLIC_SITE_URL` in your host's environment.
