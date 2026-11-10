@@ -1,10 +1,9 @@
 "use server"
 
 import { z } from "zod"
+import { LOG_SELECT } from "@/lib/calendar/log-select"
 import { createClient } from "@/lib/supabase/server"
 import type { Activity, CalendarLog } from "@/lib/types/app"
-
-const LOG_SELECT = "*, activity:activities(id, name, color, icon)" as const
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string }
 

@@ -1,5 +1,13 @@
 "use client"
 
+/**
+ * Create, edit, and delete activity logs on the calendar.
+ *
+ * Modal form: activity picker, time range, circle, save/delete via server
+ * actions. Parent (WeekCalendar) holds draft state and refreshes local logs
+ * through onSaved / onDeleted callbacks from useCircleCalendar.
+ */
+
 import { addDays, format, parse } from "date-fns"
 import { Check, ChevronsUpDown, Loader2, Plus, Trash2 } from "lucide-react"
 import { useMemo, useState, useTransition } from "react"

@@ -1,5 +1,13 @@
 "use client"
 
+/**
+ * Read-only view of another member’s log with "Join" action.
+ *
+ * Anchored to the clicked event on the grid. Join duplicates the slot onto the
+ * current user’s calendar via joinLog; parent upserts the new log/activity.
+ * Not used for the current user’s events (those open LogActivityDialog instead).
+ */
+
 import { differenceInMinutes, format } from "date-fns"
 import { Check, Clock, Loader2, UserPlus } from "lucide-react"
 import { useTransition } from "react"
