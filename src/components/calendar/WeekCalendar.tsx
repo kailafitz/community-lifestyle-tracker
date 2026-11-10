@@ -119,19 +119,21 @@ export function WeekCalendar({ circleId, circles, currentUserId, members, initia
 
   const events = useMemo<EventInput[]>(
     () =>
-      logs.map((log) => {
-        const own = log.user_id === currentUserId
-        return {
-          id: log.id,
-          start: log.start_at,
-          end: log.end_at,
-          title: log.activity.name,
-          editable: own,
-          backgroundColor: "transparent",
-          borderColor: "transparent",
-          extendedProps: { log, own },
-        }
-      }),
+      logs
+        .filter((log): log is CalendarLog & { activity: CalendarLog["activity"] } => Boolean(log.activity))
+        .map((log) => {
+          const own = log.user_id === currentUserId
+          return {
+            id: log.id,
+            start: log.start_at,
+            end: log.end_at,
+            title: log.activity.name,
+            editable: own,
+            backgroundColor: "transparent",
+            borderColor: "transparent",
+            extendedProps: { log, own },
+          }
+        }),
     [logs, currentUserId]
   )
 
@@ -212,7 +214,16 @@ export function WeekCalendar({ circleId, circles, currentUserId, members, initia
         </Button>
       </div>
 
-      <div className="calendar-shell min-h-0 flex-1">
+      <div
+        className="calendar-shell min-h-0 flex-1"
+        onPointerDownCapture={(e) => {
+          if (!details) return
+          const target = e.target
+          if (!(target instanceof Element)) return
+          if (target.closest(".fc-timegrid-event, .fc-event")) return
+          setDetails(null)
+        }}
+      >
         <FullCalendar
           ref={calendarRef}
           plugins={[timeGridPlugin, interactionPlugin]}
@@ -250,6 +261,8 @@ export function WeekCalendar({ circleId, circles, currentUserId, members, initia
           select={handleSelect}
           eventClick={handleEventClick}
           eventChange={handleEventChange}
+          eventDragStart={() => setDetails(null)}
+          eventResizeStart={() => setDetails(null)}
           eventContent={(arg) => <EventBlock arg={arg} membersById={membersById} />}
         />
       </div>
@@ -285,6 +298,24 @@ export function WeekCalendar({ circleId, circles, currentUserId, members, initia
   )
 }
 
+function NewActivityMirror({ arg, compact }: { arg: EventContentArg; compact: boolean }) {
+  return (
+    <div
+      className={cn(
+        "flex h-full w-full overflow-hidden rounded-md border border-dashed border-indigo-400/50 bg-indigo-500/15 px-1.5 py-1 text-xs text-indigo-700 dark:text-indigo-200",
+        compact ? "items-center gap-1.5" : "flex-col justify-center gap-0.5"
+      )}
+    >
+      <span className="truncate font-semibold">New activity</span>
+      {!compact && arg.timeText ? (
+        <span className="truncate text-indigo-600/75 dark:text-indigo-300/75">{arg.timeText}</span>
+      ) : compact && arg.timeText ? (
+        <span className="ml-auto shrink-0 text-indigo-600/75 tabular-nums dark:text-indigo-300/75">{arg.timeText}</span>
+      ) : null}
+    </div>
+  )
+}
+
 function EventBlock({
   arg,
   membersById,
@@ -292,21 +323,34 @@ function EventBlock({
   arg: EventContentArg
   membersById: Map<string, MemberProfile>
 }) {
-  const { log, own } = arg.event.extendedProps as { log: CalendarLog; own: boolean }
-  const Icon = getActivityIcon(log.activity.icon)
-  const member = membersById.get(log.user_id)
-  const color = log.activity.color
   const minutes = arg.event.end && arg.event.start ? differenceInMinutes(arg.event.end, arg.event.start) : 60
   const compact = minutes < 45
 
-  console.log(log);
+  const props = arg.event.extendedProps as { log?: CalendarLog; own?: boolean }
+  const log = props.log
+
+  // selectMirror placeholder (no log on the synthetic event); event drag/resize mirrors include extendedProps.
+  if (arg.isMirror && !log?.activity) {
+    return <NewActivityMirror arg={arg} compact={compact} />
+  }
+
+  if (!log?.activity) return null
+
+  const own = props.own ?? false
+  const Icon = getActivityIcon(log.activity.icon)
+  const member = membersById.get(log.user_id)
+  const color = log.activity.color
+  const isMovePreview = arg.isMirror || arg.isResizing
+  const isSourceWhileDragging = arg.isDragging
 
   return (
     <div
       className={cn(
-        "flex h-full w-full gap-1.5 overflow-hidden rounded-md px-1.5 py-1 text-xs leading-tight",
+        "flex h-full w-full gap-1.5 overflow-hidden rounded-md px-1.5 py-1 text-xs leading-tight transition-opacity",
         own ? "text-white shadow-sm" : "border-l-[3px] text-foreground",
-        compact ? "items-center" : "flex-col"
+        compact ? "items-center" : "flex-col",
+        isSourceWhileDragging && "opacity-35",
+        isMovePreview && "shadow-md ring-2 ring-foreground/10"
       )}
       style={own ? { backgroundColor: color } : { backgroundColor: `${color}26`, borderLeftColor: color }}
     >

@@ -191,7 +191,9 @@
 }
 
 .calendar-shell .fc .fc-event-mirror {
-  background: color-mix(in oklch, oklch(0.585 0.233 277.117) 30%, transparent);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .calendar-shell .fc .fc-timegrid-now-indicator-line {
