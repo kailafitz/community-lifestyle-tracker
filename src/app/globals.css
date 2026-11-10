@@ -199,3 +199,36 @@
 .calendar-shell .fc .fc-timegrid-now-indicator-line {
   border-width: 2px 0 0;
 }
+
+@media (max-width: 767px) {
+  .calendar-shell {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .calendar-shell .fc {
+    font-size: 0.75rem;
+  }
+
+  .calendar-shell .fc .fc-timegrid-slot {
+    height: 1.875rem;
+  }
+
+  .calendar-shell .fc .fc-timegrid-slot-label-cushion {
+    font-size: 0.625rem;
+    padding-right: 0.25rem;
+  }
+
+  .calendar-shell .fc .fc-timegrid-axis-cushion,
+  .calendar-shell .fc .fc-timegrid-slot-label-frame {
+    max-width: 2.5rem;
+  }
+
+  .calendar-shell .fc .fc-timegrid-event {
+    min-height: 1.25rem;
+  }
+
+  .calendar-shell .fc .fc-col-header-cell {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+}

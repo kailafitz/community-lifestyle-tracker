@@ -13,13 +13,13 @@ import { cn } from "@/lib/utils"
 
 export function CalendarDayHeader({ arg }: { arg: DayHeaderContentArg }) {
   return (
-    <div className="flex flex-col items-center py-1">
-      <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+    <div className="flex flex-col items-center py-0.5 sm:py-1">
+      <span className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase sm:text-[11px]">
         {format(arg.date, "EEE")}
       </span>
       <span
         className={cn(
-          "flex size-7 items-center justify-center rounded-full text-base font-semibold",
+          "flex size-6 items-center justify-center rounded-full text-sm font-semibold sm:size-7 sm:text-base",
           arg.isToday && "bg-indigo-500 text-white"
         )}
       >

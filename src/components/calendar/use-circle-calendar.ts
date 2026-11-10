@@ -137,8 +137,12 @@ export function useCircleCalendar({ circleId, currentUserId, initialActivities, 
   )
 
   const handleDatesSet = useCallback((arg: DatesSetArg) => {
-    setRange({ start: arg.start, end: arg.end })
-    setTitle(arg.view.title)
+    // FullCalendar may invoke this during its own render cycle (flushSync). Defer so React
+    // is not already rendering when we update parent state.
+    queueMicrotask(() => {
+      setRange({ start: arg.start, end: arg.end })
+      setTitle(arg.view.title)
+    })
   }, [])
 
   const handleSelect = useCallback(

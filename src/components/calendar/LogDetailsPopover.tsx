@@ -13,13 +13,14 @@ import { Check, Clock, Loader2, UserPlus } from "lucide-react"
 import { useTransition } from "react"
 import { toast } from "sonner"
 import { joinLog } from "@/app/actions/logs"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 import { MemberAvatars } from "@/components/dashboard/MemberAvatars"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import { getActivityIcon } from "@/lib/activity-style"
 import type { Activity, CalendarLog, MemberProfile } from "@/lib/types/app"
-import { initials } from "@/lib/utils"
+import { cn, initials } from "@/lib/utils"
 
 type Props = {
   details: { log: CalendarLog; rect: DOMRect } | null
@@ -32,6 +33,7 @@ type Props = {
 
 export function LogDetailsPopover({ details, onClose, logs, membersById, currentUserId, onJoined }: Props) {
   const [pending, startTransition] = useTransition()
+  const isMobile = useIsMobile()
 
   if (!details) return null
   const { log, rect } = details
@@ -70,7 +72,14 @@ export function LogDetailsPopover({ details, onClose, logs, membersById, current
           style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }}
         />
       </PopoverAnchor>
-      <PopoverContent key={log.id} side="right" align="start" className="w-72 gap-3">
+      <PopoverContent
+        key={log.id}
+        side={isMobile ? "bottom" : "right"}
+        align={isMobile ? "center" : "start"}
+        sideOffset={isMobile ? 8 : 4}
+        collisionPadding={16}
+        className={cn("w-72 gap-3", isMobile && "max-w-[min(18rem,calc(100vw-2rem))]")}
+      >
         <div className="flex items-start gap-3">
           <span
             className="flex size-9 shrink-0 items-center justify-center rounded-lg"

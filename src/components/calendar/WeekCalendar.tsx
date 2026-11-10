@@ -12,7 +12,8 @@
 import interactionPlugin from "@fullcalendar/interaction"
 import FullCalendar from "@fullcalendar/react"
 import timeGridPlugin from "@fullcalendar/timegrid"
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 import { toast } from "sonner"
 import { CalendarDayHeader } from "@/components/calendar/CalendarDayHeader"
 import { CalendarEventBlock } from "@/components/calendar/CalendarEventBlock"
@@ -24,6 +25,7 @@ import { useCircleCalendar } from "@/components/calendar/use-circle-calendar"
 
 export function WeekCalendar({ circleId, circles, currentUserId, members, initialActivities }: WeekCalendarProps) {
   const calendarRef = useRef<FullCalendar>(null)
+  const isMobile = useIsMobile()
   const membersById = useMemo(() => new Map(members.map((m) => [m.id, m])), [members])
 
   const {
@@ -46,10 +48,22 @@ export function WeekCalendar({ circleId, circles, currentUserId, members, initia
     handleEventChange,
   } = useCircleCalendar({ circleId, currentUserId, initialActivities, calendarRef })
 
+  const calendarView = isMobile ? "timeGridDay" : "timeGridWeek"
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      const api = calendarRef.current?.getApi()
+      if (!api || api.view.type === calendarView) return
+      api.changeView(calendarView)
+    })
+    return () => cancelAnimationFrame(id)
+  }, [calendarView])
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <CalendarToolbar
         title={title}
+        dayView={isMobile}
         onToday={() => calendarApi()?.today()}
         onPrev={() => calendarApi()?.prev()}
         onNext={() => calendarApi()?.next()}
